@@ -37,13 +37,8 @@
     <v-main class="grey lighten-3">
       
       <v-container>
-        <v-sheet
-          min-height="70vh"
-          rounded="lg"
-        >
           <!--  -->
           <nuxt/>
-        </v-sheet>
       </v-container>
     </v-main>
   </v-app>

@@ -50,28 +50,29 @@
           name="input-7-1"
           label="Corps de l'article"
           value=""
+          auto-grow
           filled
           hint=""
         ></v-textarea>
       </v-container>
       
-    <v-card-text style="height: 100px; position: absolute">
-            <v-fab-transition>
-              <v-btn
-                color="pink"
-                dark
-                absolute
-                top
-                right
-                :disabled="dialog"
-                :loading="dialog"
-                @click="dialog = true"
-              >
-                <v-icon>mdi-text-box-search-outline</v-icon> Lancer l'analyse
-              </v-btn>
-            </v-fab-transition>
-          </v-card-text>
-    </v-card>
+      <v-card-text>
+        <v-fab-transition>
+          <v-btn
+            color="pink"
+            dark
+            absolute
+            bottom
+            right
+            :disabled="dialog"
+            :loading="dialog"
+            @click="dialog = true"
+          >
+            <v-icon>mdi-text-box-search-outline</v-icon> Lancer l'analyse
+          </v-btn>
+        </v-fab-transition>
+      </v-card-text>
+      </v-card>
 
     <!-- Chargement -->
     <v-dialog
@@ -98,58 +99,161 @@
     <!-- Résultats -->
     <v-dialog
       v-model="dialog_resultat"
-      width="500"
+      width="70%"
     >
       <v-card>
-        <v-container class="mt-5">
-          <vue-word-cloud
-            style="
-              height: 150px;
-              width: 100%;
-            "
-            :words="[['Trump', 19], ['said', 3], ['fake', 7], ['covid', 2]]"
-            :color="([, weight]) => weight > 10 ? 'Black' : weight > 5 ? 'RoyalBlue' : 'Indigo'"
-            font-family="Roboto"
-          />
+
+        <v-container>
+          <v-row>
+            <v-col class="ml-1">
+              <v-row>
+                <v-alert
+                  color="info"
+                  dark
+                  dense
+                  icon="mdi-cloud-outline"
+                  border="left"
+                  class="ml-3 mb-n3 mt-3 text-center secondary rounded-tl-0 rounded-bl-0 rounded-br-0 rounded-tr-xl"
+                >
+                  Nuages de mots
+                </v-alert>
+              </v-row>
+              <v-row>
+                <v-col>
+                <v-banner elevation="1">
+                  
+                <vue-word-cloud
+                  class="ma-4"
+                  style="
+                      height: 150px;
+                      width: 100%;
+                      "
+                  :words="[['Trump', 19], ['said', 3], ['fake', 7], ['covid', 15],['Biden', 21], ['5G', 10], ['vaccin', 25], ['scam', 12]]"
+                  :color="([, weight]) => weight > 10 ? 'black' : weight > 5 ? 'RoyalBlue' : 'Indigo'"
+                  font-family="Roboto"
+                  >
+                  <template slot-scope="{text, weight, word}">
+                    <v-tooltip
+                        v-model="show"
+                        top
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                            <div v-on="on" :title="weight" style="cursor: pointer;" @click="onWordClick(word)">
+                              {{ text }}
+                            </div>
+                        </template>
+                        <div><b>{{ text }}</b> est présent {{ weight }} fois dans l'article</div>
+                      </v-tooltip>
+                  </template>
+                </vue-word-cloud>
+
+                </v-banner>
+                </v-col>
+              </v-row>
+          </v-col>
+          <v-col>
+            test
+          </v-col>
+          </v-row>
         </v-container>
-        <v-card-text>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        </v-card-text>
+
+
+
         <v-container>
           <v-row>
             <v-col>
               <v-row>
-                <!-- Véracité -->
-                <v-container>
-                  <v-progress-circular
-                    :rotate="90"
-                    :size="110"
-                    :width="5"
-                    :value="80"
-                    color="teal"
-                  >
-                    Véracité
-                  </v-progress-circular>
-                </v-container>
+
+                <v-alert
+                  color="info"
+                  dark
+                  dense
+                  border="left"
+                  class="ml-4 mt-4 mb-0 text-center secondary rounded-tl-0 rounded-bl-0 rounded-br-0 rounded-tr-xl"
+                  icon="mdi-flask"
+                >
+                  Analyse globale 
+                </v-alert>
               </v-row>
               <v-row>
-                <!-- Objectivité -->
-                <v-container>
-                  <v-progress-circular
-                    :rotate="90"
-                    :size="110"
-                    :width="5"
-                    :value="40"
-                    color="red"
-                  >
-                    Objectivité
-                  </v-progress-circular>
-                </v-container>
+              <v-banner class="ml-4" elevation="3">
+                <v-row>
+                  <v-col class="m-2" cols="4">
+                  <!-- Véracité -->
+                    <!-- Cercle -->
+                    <v-progress-circular
+                      :rotate="90"
+                      :size="110"
+                      :width="5"
+                      :value="80"
+                      color="teal"
+                    >
+                      Véracité
+                    </v-progress-circular>
+                  </v-col>
+                  <v-col>
+                    <!-- Info -->
+                    <v-alert
+                      border="left"
+                      color="green"
+                      icon="mdi-check"
+                      outlined
+                      text
+                    >
+                      Le véracité correspond aux proportion d'informations jugé véridique par rapport aux informations jugé fausse 
+                    </v-alert>
+                  </v-col>
+                </v-row>
+
+                <v-divider class="my-5"></v-divider>
+                <v-row>
+                  <v-col class="m-2" cols="4">
+                  <!-- Objectivité -->
+                    <!-- Cercle -->
+                    <v-progress-circular
+                      :rotate="90"
+                      :size="110"
+                      :width="5"
+                      :value="40"
+                      color="red"
+                    >
+                      Objectivité
+                    </v-progress-circular>
+                  </v-col>
+                  <v-col>
+                    <!-- Info -->
+                    <v-alert
+                      border="right"
+                      color="blue"
+                      icon="mdi-compass"
+                      outlined
+                      text
+                    >
+                      L'objectivité est un indice d'impartialité à propos de l'écriture de l'article
+                    </v-alert>
+                  </v-col>
+                </v-row>
+              </v-banner>
               </v-row>
             </v-col>
               
             <v-col>
-              
+                <v-banner elevation="1" style="height=100%;">
+                  <v-list-item>
+                    <v-list-item-icon>
+                      <v-icon>mdi-newspaper</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                      <v-list-item-title class="title">
+                        Titre
+                      </v-list-item-title>
+                      <v-list-item-subtitle>
+                        article
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-divider></v-divider>
+                </v-banner>
             </v-col>
           </v-row>
         </v-container>
@@ -183,9 +287,14 @@ export default {
       return {
         dialog: false,
         dialog_resultat: false,
+        words: [['romance', 19], ['horror', 3], ['fantasy', 7], ['adventure', 3]]
       }
     },
-
+    methods: {
+      onWordClick: function(word) {
+        
+      }
+    },
     watch: {
       dialog (val) {
         if (!val) return
