@@ -458,7 +458,7 @@ export default {
       },
       extractionArticleURL: async (url) => {
         try {
-          const response = await fetch(url);
+          const response = await fetch('https://cors-anywhere.herokuapp.com/' + url);
           const text = await response.text();
           var test = text.match(/<article[^<>]*>([\s\S]*?)<\/article>/);
           
