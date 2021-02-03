@@ -27,7 +27,7 @@
           <v-col
             cols="9">
             <v-text-field
-              v-model="message4"
+              v-model="lien"
               label="Lien de l'article"
               placeholder="Coller l'URL de l'article"
               filled
@@ -40,6 +40,7 @@
               <v-btn
                 class="rounded-lg"
                 color="primary"
+                v-on:click="extractionArticle()"
                 dark>
                 Extraire l'article
               </v-btn>
@@ -55,7 +56,7 @@
         <v-textarea
           name="input-7-1"
           label="Corps de l'article"
-          value=""
+          :value="article_text"
           auto-grow
           filled
           hint=""
@@ -433,16 +434,67 @@ export default {
     },
     data () {
       return {
+        lien: '',
         dialog: false,
+        article_text: '',
         dialog_resultat: false,
         words: [['romance', 19], ['horror', 3], ['fantasy', 7], ['adventure', 3]]
       }
     },
     methods: {
       onWordClick: function(word) {
+      },
+      getParagraphs: function(htmlString) {
+        const div = document.createElement("div");
+        div.insertAdjacentHTML("beforeend", htmlString);
         
+        return Array.from(div.querySelectorAll("p"))
+                    .filter(p => p.textContent !== "") // because of the lonely </p> at the end - optional
+                    .map(p => p.outerHTML);
+      },
+      extractionArticle: function () {
+        this.extractionArticleURL(this.lien)
+          .then(result => this.article_text = result)
+      },
+      extractionArticleURL: async (url) => {
+        try {
+          const response = await fetch(url);
+          const text = await response.text();
+          var test = text.match(/<article[^<>]*>([\s\S]*?)<\/article>/);
+          
+          var htmlString = test[1]
+          const div = document.createElement("div");
+          div.insertAdjacentHTML("beforeend", htmlString);
+          
+          var paragraphes = Array.from(div.querySelectorAll("p"))
+                      .filter(p => p.textContent !== "")
+                      .map(p => p.outerHTML);
+          
+          for(var i=0; i<paragraphes.length; i++){
+            // Retrait des balises
+            paragraphes[i] = paragraphes[i].replace(/(<([^>]+)>)/ig, "")
+            
+            // Retrait des caractères d'espacement
+            paragraphes[i] = paragraphes[i].replace(/&nbsp;/g, ' ')
+          }
+
+          // On choisis seulement les paragraphe de plus de 100 caractères
+          paragraphes = Array.from(paragraphes)
+                          .filter(p => p.length > 100)
+
+
+          return paragraphes.join("\n\n")
+        }
+        catch
+        {
+          return ''
+        }
       }
     },
+    mounted: function() {
+      
+    },
+
     watch: {
       dialog (val) {
         if (!val) return
