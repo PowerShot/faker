@@ -479,7 +479,7 @@ export default {
 
         this.extractionArticleURL(this.lien)
           .then(result => {
-            
+            console.log(result)
             if(result.length > 100) {
               this.article_text = result
             } else {
@@ -500,11 +500,13 @@ export default {
 
       extractionArticleURL: async (url) => {
         try {
-          const response = await fetch('https://cors-anywhere.herokuapp.com/' + url);
-          const text = await response.text();
-          var test = text.match(/<article[^<>]*>([\s\S]*?)<\/article>/);
+          const response = await fetch(url, {mode: 'cors'});
           
-          var htmlString = test[1]
+          const text = await response.text();
+          console.log(text)
+          var test = text.match(/<article[^<>]*>([\s\S]*?)<\/article>/);
+          console.log(test)
+          var htmlString = (test == null ? text : test[1]) 
           const div = document.createElement("div");
           div.insertAdjacentHTML("beforeend", htmlString);
           
@@ -512,6 +514,7 @@ export default {
                       .filter(p => p.textContent !== "")
                       .map(p => p.outerHTML);
           
+          console.log(text)
           for(var i=0; i<paragraphes.length; i++){
             // Retrait des balises
             paragraphes[i] = paragraphes[i].replace(/(<([^>]+)>)/ig, "")
@@ -529,6 +532,7 @@ export default {
         }
         catch
         {
+          console.log("erreur extraction")
           return ''
         }
       }
