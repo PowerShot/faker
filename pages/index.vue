@@ -500,8 +500,8 @@ export default {
 
       extractionArticleURL: async (url) => {
         try {
-          const response = await fetch(url, {mode: 'no-cors'});
-          
+          const response = await fetch('https://corsefaker.herokuapp.com/' + url);
+          console.log(response)
           const text = await response.text();
           console.log(text)
           var test = text.match(/<article[^<>]*>([\s\S]*?)<\/article>/);
