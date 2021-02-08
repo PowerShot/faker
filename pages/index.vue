@@ -500,7 +500,7 @@ export default {
 
       extractionArticleURL: async (url) => {
         try {
-          const response = await fetch(url, {mode: 'cors'});
+          const response = await fetch(url, {mode: 'no-cors'});
           
           const text = await response.text();
           console.log(text)
