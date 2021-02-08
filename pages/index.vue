@@ -19,13 +19,21 @@
 
       <v-card-subtitle>
         Pour utiliser notre outil, copier/coller les articles que vous voulez analyser ci-dessous (au format texte) ou l'extraire via le lien :
+        Il nous est impossible d'extraire l'article que vous avez entré, veuillez le copier/coller dans le champs 'Corps de l'article'
       </v-card-subtitle>
+      <div v-show="erreur_extraction">
+        <div class="red darken-4 text-center py-2">
+          <span class="white--text">Il nous est impossible d'extraire l'article via le lien URL que vous avez entré, veuillez le copier/coller dans le champs 'Corps de l'article'</span>
+          
+        </div>
+        <v-progress-linear color="red lighten-2" value="0" height="5"></v-progress-linear>
+      </div>
 
       <!-- URL -->
       <v-container>
         <v-row>
           <v-col
-            cols="9">
+            cols="10">
             <v-text-field
               v-model="lien"
               label="Lien de l'article"
@@ -35,25 +43,32 @@
               clearable
             ></v-text-field>
           </v-col>
-          <v-col>
+          
+          <v-col
+            cols="2">
             <v-card-actions class="justify-end">
               <v-btn
                 class="rounded-lg"
                 color="primary"
+                :loading="loading_extraction"
                 v-on:click="extractionArticle()"
-                dark>
+                dark
+                >
                 Extraire l'article
               </v-btn>
             </v-card-actions>
           </v-col>
         </v-row>
       </v-container>
+      
 
       <v-divider></v-divider>
       
-      <!-- Corpds de l'article -->
+      <!-- Corps de l'article -->
       <v-container>
         <v-textarea
+          clearable
+          clear-icon="mdi-close-circle"
           name="input-7-1"
           label="Corps de l'article"
           :value="article_text"
@@ -434,6 +449,9 @@ export default {
     },
     data () {
       return {
+        timer_alerte: 0,
+        loading_extraction: false,
+        erreur_extraction: false,
         lien: '',
         dialog: false,
         article_text: '',
@@ -452,10 +470,34 @@ export default {
                     .filter(p => p.textContent !== "") // because of the lonely </p> at the end - optional
                     .map(p => p.outerHTML);
       },
+
+
+
       extractionArticle: function () {
+        this.loading_extraction = true
+        this.erreur_extraction = false
+
         this.extractionArticleURL(this.lien)
-          .then(result => this.article_text = result)
+          .then(result => {
+            
+            if(result.length > 100) {
+              this.article_text = result
+            } else {
+              this.erreur_extraction = true
+              this.timer_alerte = 0
+              this.article_text = ''
+            }
+
+            console.log(result)
+            this.loading_extraction = false
+            
+            })
+          
       },
+
+
+
+
       extractionArticleURL: async (url) => {
         try {
           const response = await fetch('https://cors-anywhere.herokuapp.com/' + url);
@@ -501,6 +543,7 @@ export default {
         setTimeout(() => {
           this.dialog = false
           this.dialog_resultat = true
+          this.erreur_extraction = false
           }, 2000)
         
       },
