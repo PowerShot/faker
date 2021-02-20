@@ -19,7 +19,6 @@
 
       <v-card-subtitle>
         Pour utiliser notre outil, copier/coller les articles que vous voulez analyser ci-dessous (au format texte) ou l'extraire via le lien :
-        Il nous est impossible d'extraire l'article que vous avez entré, veuillez le copier/coller dans le champs 'Corps de l'article'
       </v-card-subtitle>
       <div v-show="erreur_extraction">
         <div class="red darken-4 text-center py-2">
