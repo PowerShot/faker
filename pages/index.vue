@@ -54,9 +54,6 @@
 
           <!-- URL -->
           <v-container>
-            <v-row>
-              <v-col
-                cols="10">
                 <v-text-field
                   v-model="lien"
                   label="Lien de l'article"
@@ -65,10 +62,7 @@
                   outlined
                   clearable
                 ></v-text-field>
-              </v-col>
               
-              <v-col
-                cols="2">
                 <v-card-actions class="justify-end">
                   <v-btn
                     class="rounded-lg"
@@ -80,8 +74,6 @@
                     Extraire l'article
                   </v-btn>
                 </v-card-actions>
-              </v-col>
-            </v-row>
           </v-container>
           
 
@@ -171,7 +163,8 @@
                 >
                   <v-toolbar-title>Voila les outils mis à votre dispositions</v-toolbar-title>
                 </v-toolbar>
-                <v-tabs vertical>
+                <v-tabs :vertical="isVertical">
+                  <v-tabs-slider></v-tabs-slider>
                   <v-tab>
                     <v-icon left>
                       mdi-flask
@@ -467,7 +460,8 @@ export default {
         dialog_resultat: false,
         article_paragraphes: [],
         article_analyse_json: [],
-        words_cloud: []
+        words_cloud: [],
+        isVertical: true
       }
     },
     methods: {
@@ -636,13 +630,22 @@ export default {
         return
       },
 
-      clickLoading: function () {
-        
+      onResize() {
+        if(window.innerWidth < 800) this.isVertical = false
+        else this.isVertical = true
+        console.log("size :", window.innerWidth)
       }
 
     },
     mounted: function() {
+      this.onResize()
+      this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+    })
     },
+    beforeDestroy() { 
+    window.removeEventListener('resize', this.onResize); 
+  },
 
     watch: {
       dialog (val) {
