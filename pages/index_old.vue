@@ -216,8 +216,8 @@
                               :rotate="90"
                               :size="110"
                               :width="5"
-                              :value="veracity"
-                              :color="getColorResults(veracity)"
+                              :value="80"
+                              color="teal"
                             >
                               Véracité
                             </v-progress-circular>
@@ -245,8 +245,8 @@
                               :rotate="90"
                               :size="110"
                               :width="5"
-                              :value="objectivity"
-                              :color="getColorResults(objectivity)"
+                              :value="40"
+                              color="red"
                             >
                               Objectivité
                             </v-progress-circular>
@@ -367,36 +367,329 @@
                   <v-tab-item>
                     <v-card flat>
                       <v-card-text>
-                        <v-data-table
-                          :headers="headers"
-                          :items="article_analyse_json[0]"
-                          class="elevation-1"
-                        >
-                          <template v-slot:item.polarity="{ item }">
-                            <v-chip
-                              :color="getColorPolarity(item.polarity)"
-                              dark
-                            >
-                              {{ item.polarity }} %
-                            </v-chip>
-                          </template>
-                          <template v-slot:item.subjectivity="{ item }">
-                            <v-chip
-                              :color="getColorSubjectivity(item.subjectivity)"
-                              dark
-                            >
-                              {{ item.subjectivity }} %
-                            </v-chip>
-                          </template>
-                        </v-data-table>
+                        
                       </v-card-text>
                     </v-card>
                   </v-tab-item>
                 </v-tabs>
               </v-card>
             </v-row>
+
+
+            <!-- Ligne 1 -->
+            <v-row>
+
+              <!-- Nuage de mots -->
+              <v-col class="ml-1">
+                <!-- Tag -->
+                <v-row>
+                  <v-alert
+                    color="info"
+                    dark
+                    dense
+                    icon="mdi-cloud-outline"
+                    border="left"
+                    class="ml-3 mb-n3 mt-6 text-center secondary rounded-tl-0 rounded-bl-0 rounded-br-0 rounded-tr-xl"
+                  >
+                    Nuage de mots
+                  </v-alert>
+                </v-row>
+                
+                <!-- Contenu -->
+                <v-row>
+                  <v-col>
+                    <v-banner elevation="1">
+                      
+                      <vue-word-cloud
+                        class="ma-4"
+                        style="
+                            height: 255px;
+                            width: 90%;
+                            "
+                        :animation-duration="2000"
+                        :rotation="4"
+                        :spacing="1"
+                        rotation-unit="deg"
+                        :words="words_cloud"
+                        :color="([, weight]) => weight > 10 ? 'black' : weight > 5 ? 'RoyalBlue' : 'Indigo'"
+                        font-family="Roboto"
+                        >
+                        <template slot-scope="{text, weight, word}">
+                          <v-tooltip
+                              v-model="show"
+                              top
+                            >
+                              <template v-slot:activator="{ on }">
+                                  <div v-on="on" :title="weight" style="cursor: pointer;" @click="onWordClick(word)">
+                                    {{ text }}
+                                  </div>
+                              </template>
+                              <div><b>{{ text }}</b> est présent {{ weight }} fois dans l'article</div>
+                            </v-tooltip>
+                        </template>
+                      </vue-word-cloud>
+
+                    </v-banner>
+                  </v-col>
+                </v-row>
+              </v-col>
+
+              <!-- Article analysé -->
+              <v-col>
+
+                <!-- Tag -->
+                <v-row>
+                    <v-alert
+                      color="info"
+                      dark
+                      dense
+                      icon="mdi-pencil-outline"
+                      border="left"
+                      class="ml-3 mb-n3 mt-6 text-center secondary rounded-tl-0 rounded-bl-0 rounded-br-0 rounded-tr-xl"
+                    >
+                      Article analysé
+                    </v-alert>
+                </v-row>
+                
+                <!-- Contenu -->
+                <v-row>
+                  <v-card class="mt-3 ml-3" height="320px">
+                    <v-responsive
+                      max-height="100%"
+                      class="overflow-y-auto pa-3">
+                      <p class="text-caption" v-for="paragraphe in article_paragraphes">
+                        <span class="mr-4"></span> {{ paragraphe }}
+                        </p>
+                    </v-responsive>
+                  </v-card>
+                </v-row>
+
+              </v-col>
+            
+            </v-row>
           </v-container>
+
+          <!-- 2e ligne -->
+          <v-container>
+
+            <!-- Analyse globale -->
+            <v-row>
+              <v-col>
+
+                <!-- Tag -->
+                <v-row>
+                  <v-alert
+                    color="info"
+                    dark
+                    dense
+                    border="left"
+                    class="ml-4 mt-4 mb-0 text-center secondary rounded-tl-0 rounded-bl-0 rounded-br-0 rounded-tr-xl"
+                    icon="mdi-flask"
+                  >
+                    Analyse globale 
+                  </v-alert>
+                </v-row>
+
+                <!-- Contenu -->
+                <v-row>
+                <v-banner class="ml-4" elevation="3">
+                  <v-row>
+                    <v-col class="m-2" cols="4">
+                    <!-- Véracité -->
+                      <!-- Cercle -->
+                      <v-progress-circular
+                        :rotate="90"
+                        :size="110"
+                        :width="5"
+                        :value="80"
+                        color="teal"
+                      >
+                        Véracité
+                      </v-progress-circular>
+                    </v-col>
+                    <v-col>
+                      <!-- Info -->
+                      <v-alert
+                        border="left"
+                        color="green"
+                        icon="mdi-check"
+                        outlined
+                        text
+                      >
+                        Le véracité correspond aux proportion d'informations jugé véridique par rapport aux informations jugé fausse 
+                      </v-alert>
+                    </v-col>
+                  </v-row>
+
+                  <v-divider class="my-5"></v-divider>
+                  <v-row>
+                    <v-col class="m-2" cols="4">
+                    <!-- Objectivité -->
+                      <!-- Cercle -->
+                      <v-progress-circular
+                        :rotate="90"
+                        :size="110"
+                        :width="5"
+                        :value="40"
+                        color="red"
+                      >
+                        Objectivité
+                      </v-progress-circular>
+                    </v-col>
+
+                    <v-col>
+                      <!-- Info -->
+                      <v-alert
+                        border="right"
+                        color="blue"
+                        icon="mdi-compass"
+                        outlined
+                        text
+                      >
+                        L'objectivité est un indice d'impartialité à propos de l'écriture de l'article
+                      </v-alert>
+                    </v-col>
+                  </v-row>
+                </v-banner>
+                <!-- fin contenu -->
+
+
+                </v-row>
+              </v-col>
+              
+
+              <!-- Articles en lien -->
+              <v-col>
+
+                <!-- Tag -->
+                <v-row>
+                  <v-alert
+                    color="info"
+                    dark
+                    dense
+                    border="left"
+                    class="ml-6 mb-0 mt-4 text-center secondary rounded-tl-0 rounded-bl-0 rounded-br-0 rounded-tr-xl"
+                    icon="mdi-newspaper"
+                  >
+                    Articles en lien
+                  </v-alert>
+                </v-row>
+              
+                <!-- Contenu -->
+                <v-row class="mt-0 ml-auto">
+                  <v-container>
+                    
+                    <v-card elevation="1" style="height=100%;">
+                      <v-list-item>
+                        <v-list-item-icon>
+                          <v-icon>mdi-newspaper</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                          <v-list-item-title class="title">
+                            Titre
+                          </v-list-item-title>
+                          <v-list-item-subtitle>
+                            article
+                          </v-list-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+                      <v-divider></v-divider>
+
+                      <v-list-item>
+                        <v-list-item-icon>
+                          <v-icon>mdi-newspaper</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                          <v-list-item-title class="title">
+                            Titre
+                          </v-list-item-title>
+                          <v-list-item-subtitle>
+                            article
+                          </v-list-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+                      <v-divider></v-divider>
+
+                      <v-list-item>
+                        <v-list-item-icon>
+                          <v-icon>mdi-newspaper</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                          <v-list-item-title class="title">
+                            Titre
+                          </v-list-item-title>
+                          <v-list-item-subtitle>
+                            article
+                          </v-list-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+                      <v-divider></v-divider>
+
+                      <v-list-item>
+                        <v-list-item-icon>
+                          <v-icon>mdi-newspaper</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                          <v-list-item-title class="title">
+                            Titre
+                          </v-list-item-title>
+                          <v-list-item-subtitle>
+                            article
+                          </v-list-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+                      <v-divider></v-divider>
+                    </v-card></v-container>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-container>
+
+          
+          
+
         </v-card>
+        <v-data-table
+            :headers="headers"
+            :items="article_analyse_json[0]"
+            class="elevation-1"
+          >
+            <template v-slot:item.polarity="{ item }">
+              <v-chip
+                :color="getColorPolarity(item.polarity)"
+                dark
+              >
+                {{ item.polarity }} %
+              </v-chip>
+            </template>
+            <template v-slot:item.subjectivity="{ item }">
+              <v-chip
+                :color="getColorSubjectivity(item.subjectivity)"
+                dark
+              >
+                {{ item.subjectivity }} %
+              </v-chip>
+            </template>
+          </v-data-table>
+      </v-stepper-content>
+
+      <v-stepper-content step="3">
+        <v-card
+          class="mb-12"
+          color="grey lighten-1"
+          height="200px"
+        ></v-card>
+
+        <v-btn
+          color="primary"
+          @click="e1 = 1"
+        >
+          Continue
+        </v-btn>
+
+        <v-btn text>
+          Cancel
+        </v-btn>
       </v-stepper-content>
     </v-stepper-items>
   </v-stepper>
@@ -454,8 +747,6 @@ export default {
           { text: 'Sentiments', value: 'polarity' },
           { text: 'Subjectivité', value: 'subjectivity' },
         ],
-        objectivity: 0,
-        veracity: 0,
         timer_alerte: 0,
         loading_API: false,
         loading_extraction: false,
@@ -499,14 +790,6 @@ export default {
         else if (val > 25) return 'deep-orange lighten-3'
         else if (val > 0) return 'deep-orange lighten-4'
         else return 'blue-grey lighten-5'
-      },
-
-      getColorResults: function (val) {
-        if (val > 75) return 'green lighten-1'
-        else if (val > 50) return 'green lighten-4'
-        else if (val > 25) return 'deep-orange lighten-4'
-        else if (val > 0) return 'deep-orange lighten-1'
-        else return 'red'
       },
 
       extractionArticle: function () {
@@ -611,7 +894,11 @@ export default {
       articleAnalyseEach: function (results) {
         this.articleAnalyseAPI(results)
         .then(result => {
-          
+          this.article_analyse_json = result
+          this.dialog = false
+          this.dialog_resultat = true
+          this.erreur_extraction = false
+          this.e1 = 2
 
 
           this.words_cloud = []
@@ -620,15 +907,7 @@ export default {
           }
 
           this.article_paragraphes = result[1]["text"].split('\n\n')
-
-          this.objectivity = 100 - Math.abs(result[1]["polarity"])
-          this.veracity = result[1]["proba_true"]
-
-          this.article_analyse_json = result
-          this.dialog = false
-          this.dialog_resultat = true
-          this.erreur_extraction = false
-          this.e1 = 2
+          
           console.log(result)
           
         }).catch(err => console.log(err))
