@@ -207,12 +207,12 @@
                             <!-- Cercle -->
                             <v-progress-circular
                               :rotate="90"
-                              :size="110"
-                              :width="5"
+                              :size="150"
+                              :width="15"
                               :value="veracity"
                               :color="getColorResults(veracity)"
                             >
-                              Véracité
+                              <b>Véracité</b> : {{ this.veracity }}%
                             </v-progress-circular>
                           </v-col>
                           <v-col>
@@ -236,12 +236,12 @@
                             <!-- Cercle -->
                             <v-progress-circular
                               :rotate="90"
-                              :size="110"
-                              :width="5"
+                              :size="150"
+                              :width="15"
                               :value="objectivity"
                               :color="getColorResults(objectivity)"
                             >
-                              Objectivité
+                              <b>Objectivité</b> : {{this.objectivity}}%
                             </v-progress-circular>
                           </v-col>
 
@@ -345,44 +345,12 @@
                               {{ item.polarity }} %
                             </v-chip>
                           </template>
-                          <template v-slot:item.subjectivity="{ item }">
-                            <v-chip
-                              :color="getColorSubjectivity(item.subjectivity)"
-                              dark
-                            >
-                              {{ item.subjectivity }} %
-                            </v-chip>
-                          </template>
                         </v-data-table>
                       </v-card-text>
                     </v-card>
                   </v-tab-item>
                   <v-tab-item>
                     <v-card flat>
-                      <v-card-text>
-                        <v-data-table
-                          :headers="headers"
-                          :items="article_analyse_json[0]"
-                          class="elevation-1"
-                        >
-                          <template v-slot:item.polarity="{ item }">
-                            <v-chip
-                              :color="getColorPolarity(item.polarity)"
-                              dark
-                            >
-                              {{ item.polarity }} %
-                            </v-chip>
-                          </template>
-                          <template v-slot:item.subjectivity="{ item }">
-                            <v-chip
-                              :color="getColorSubjectivity(item.subjectivity)"
-                              dark
-                            >
-                              {{ item.subjectivity }} %
-                            </v-chip>
-                          </template>
-                        </v-data-table>
-                      </v-card-text>
                     </v-card>
                   </v-tab-item>
                 </v-tabs>
@@ -445,7 +413,6 @@ export default {
             value: 'text',
           },
           { text: 'Sentiments', value: 'polarity' },
-          { text: 'Subjectivité', value: 'subjectivity' },
         ],
         objectivity: 0,
         veracity: 0,
@@ -485,14 +452,6 @@ export default {
         else if (val > -25) return 'deep-orange lighten-3'
         else if (val > -75) return 'deep-orange lighten-2'
         else return 'deep-orange lighten-1'
-      },
-
-      getColorSubjectivity: function (val) {
-        if (val > 75) return 'deep-orange lighten-1'
-        else if (val > 50) return 'deep-orange lighten-2'
-        else if (val > 25) return 'deep-orange lighten-3'
-        else if (val > 0) return 'deep-orange lighten-4'
-        else return 'blue-grey lighten-5'
       },
 
       getColorResults: function (val) {

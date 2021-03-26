@@ -208,7 +208,7 @@
                   <v-tab-item>
                     <v-card flat>
                       <v-card-text>
-                        <v-row>
+                        <v-col>
                           <v-col class="m-2" cols="4">
                           <!-- Véracité -->
                             <!-- Cercle -->
@@ -234,7 +234,7 @@
                               Le véracité correspond aux proportion d'informations jugé véridique par rapport aux informations jugé fausse 
                             </v-alert>
                           </v-col>
-                        </v-row>
+                        </v-col>
 
                         <v-divider class="my-5"></v-divider>
                         <v-row>
