@@ -18,7 +18,7 @@
 
         <nuxt-link
           style="text-decoration: none; color: inherit;"
-          to="/about">
+          to="/">
             <v-btn
               text
             >
