@@ -15,13 +15,37 @@
           <img src="ic_launcher.png" alt="logo">
         </v-avatar>
 
+
         <v-btn
-          v-for="link in links"
-          :key="link"
           text
         >
-          {{ link }}
+          <nuxt-link
+            style="text-decoration: none; color: inherit;"
+            to="/">
+              Accueil
+          </nuxt-link>
         </v-btn>
+
+        <v-btn
+          text
+        >
+          <nuxt-link
+            style="text-decoration: none; color: inherit;"
+            to="/about">
+              à propos
+          </nuxt-link>
+        </v-btn>
+
+        <v-btn
+          text
+        >
+          <nuxt-link
+            style="text-decoration: none; color: inherit;"
+            to="/data">
+              vos données
+          </nuxt-link>
+        </v-btn>
+
         </v-responsive>
 
 
@@ -78,7 +102,6 @@
                     v-model="name"
                     :rules="nameRules"
                     label="Nom (facultatif)"
-                    required
                   ></v-text-field>
 
                   <v-text-field
@@ -98,7 +121,6 @@
                       clear-icon="mdi-close-circle"
                       name="input-7-1"
                       label="Message"
-                      :value="article_text"
                       auto-grow
                       filled
                       hint=""
@@ -110,7 +132,7 @@
                     class="mr-4"
                     @click="validate;dialog.value = false"
                   >
-                    Validate
+                    Envoyer
                   </v-btn>
 
                   <v-btn
@@ -118,7 +140,7 @@
                     class="mr-4"
                     @click="reset"
                   >
-                    Reset Form
+                    Réinitailiser le formulaire
                   </v-btn>
                 </v-form>
               </v-card-text>
@@ -137,6 +159,7 @@
           text
           rounded
           class="my-2"
+          @click="openNewPage('https://github.com/Gosow/Faker')"
         >
           <v-icon class="mx-2">mdi-github</v-icon>
           code source serveur
@@ -146,9 +169,21 @@
           text
           rounded
           class="my-2"
+          @click="openNewPage('https://github.com/PowerShot/faker')"
         >
           <v-icon class="mx-2">mdi-github</v-icon>
           code source site
+        </v-btn>
+
+        <v-btn
+          color="white"
+          text
+          rounded
+          class="my-2"
+          @click="openNewPage('https://github.com/Gosow/Faker/blob/main/Faker.ipynb')"
+        >
+          <v-icon class="mx-2">mdi-language-python</v-icon>
+          code IA
         </v-btn>
 
         <v-col
@@ -182,6 +217,9 @@
       ],
     }),
     methods: {
+      openNewPage(link){
+        window.open(link, "_blank")
+      },
       validate () {
         this.$refs.form.validate()
       },

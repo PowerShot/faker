@@ -84,11 +84,11 @@
             <v-textarea
               clearable
               clear-icon="mdi-close-circle"
-              name="input-7-1"
               label="Corps de l'article"
-              :value="article_text"
+              v-model="article_text"
               auto-grow
               filled
+              append
               hint=""
             ></v-textarea>
           </v-container>
@@ -104,7 +104,7 @@
                 :disabled="dialog"
                 :loading="dialog"
                 
-                @click="articleAnalyseEach(article_text);dialog = true"
+                @click="articleAnalyseEach(article_text)"
               >
                 <v-icon>mdi-text-box-search-outline</v-icon> Lancer l'analyse
               </v-btn>
@@ -121,7 +121,7 @@
           <v-btn
             color="primary"
             text
-            @click="e1 = 1; articleAnalyseEach()"
+            @click="e1 = 1"
           >
             <v-icon
               left
@@ -131,6 +131,85 @@
             </v-icon>
             retour à la saisie de l'article
           </v-btn>
+          <v-spacer></v-spacer>
+
+
+          <v-dialog
+            transition="dialog-bottom-transition"
+            max-width="600"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                color="primary"
+                text
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon
+                  left
+                  dark
+                >
+                  mdi-comment-question
+                </v-icon>
+                donnez votre avis
+              </v-btn>
+              </template>
+              <template v-slot:default="dialog">
+                <v-card>
+                  <v-toolbar
+                    color="primary"
+                    dark
+                  >Formulaire de contact</v-toolbar>
+                  <v-card-text>
+                    <v-form
+                      ref="form"
+                      v-model="valid"
+                      lazy-validation
+                    >
+                      <v-subheader class="pl-0">
+                        Quel note donneriez vous aux résultats ?
+                      </v-subheader>
+                      <v-slider
+                        v-model="slider"
+                        :thumb-size="24"
+                        thumb-label="always"
+                        thumb-color="grey lighten-3"
+                        color="green"
+                        track-color="red"
+                        height="50px"
+                        loader-height="30px"
+                      >
+                      
+
+                        <template v-slot:thumb-label="{ value }">
+                          {{ satisfactionEmojis[Math.min(Math.floor(value / 10), 9)] }}
+                        </template>
+                      </v-slider>
+
+                      <v-text-field
+                        label="Votre avis (facultatif)"
+                      ></v-text-field>
+
+                      <v-btn
+                        color="success"
+                        class="mr-4"
+                        @click="dialog.value = false"
+                      >
+                        Envoyer
+                      </v-btn>
+                      <v-btn
+                        class="mr-4"
+                        @click="dialog.value = false"
+                      >
+                        Fermer
+                      </v-btn>
+
+                    </v-form>
+                  </v-card-text>
+                </v-card>
+              </template>
+            </v-dialog>
+          
         </v-card-actions>
         <v-container>
 
@@ -165,6 +244,7 @@
                 </v-toolbar>
                 <v-tabs :vertical="isVertical">
                   <v-tabs-slider></v-tabs-slider>
+                  <small class="text-uppercase mt-5">synthèse</small>
                   <v-tab>
                     <v-icon left>
                       mdi-flask
@@ -173,6 +253,7 @@
                       Analyse globale
                     </small> 
                   </v-tab>
+                  <small class="text-uppercase mt-5">résultats avancées</small>
                   <v-tab>
                     <v-icon left>
                       mdi-pencil-outline
@@ -189,7 +270,7 @@
                       Analyse par bloc
                     </small> 
                   </v-tab>
-                  <v-tab>
+                  <v-tab disabled>
                     <v-icon left>
                       mdi-newspaper
                     </v-icon>
@@ -201,6 +282,17 @@
                   <v-tab-item>
                     <v-card flat>
                       <v-card-text>
+                        <v-alert
+                          class="mt-2 ml-2"
+                          color="blue-grey"
+                          dark
+                          icon="mdi-information-outline"
+                          border="top"
+                          outlined
+                        >
+                          Il s'agit d'une <b>synthèse globale</b> de l'analyse faite par l'IA. Si vous souhaitez en savoir plus vous pouvez aller aux différents onglets en dessous de "<b>résultats avancées</b>.
+                          Si vous avez des remarques ou un avis à donner, vous pouvez le faire sur le bouton "<b>donnez votre avis</b>".
+                        </v-alert>
                         <v-row>
                           <v-col class="m-2" cols="4">
                           <!-- Véracité -->
@@ -258,73 +350,86 @@
                             </v-alert>
                           </v-col>
                         </v-row>
+                        
                 <!-- fin contenu -->
                       </v-card-text>
                     </v-card>
                   </v-tab-item>
                   <v-tab-item>
+                    <v-alert
+                      class="mt-2 ml-2"
+                      color="blue-grey"
+                      dark
+                      icon="mdi-information-outline"
+                      border="top"
+                      outlined
+                    >
+                    Vous avez accès au <b>nuage de mots</b> les plus utilisées dans l'article. Vous pouvez cliquer sur le mot du nuage pour qu'il apparaisse en surbrillance dans l'article. Appuyez à nouveau pour retirer la surbrillance.
+                    </v-alert>
+
+
                     <v-card flat>
                       <v-alert
-                    color="info"
-                    dark
-                    dense
-                    icon="mdi-cloud-outline"
-                    border="left"
-                    class="ml-3 mb-n3 mt-6 text-center secondary rounded-tl-0 rounded-bl-0 rounded-br-0 rounded-tr-xl"
-                  >
-                    Nuage de mots
-                  </v-alert>
+                      color="info"
+                      dark
+                      dense
+                      icon="mdi-cloud-outline"
+                      border="left"
+                      class="ml-3 mb-n3 mt-6 text-center secondary rounded-tl-0 rounded-bl-0 rounded-br-0 rounded-tr-xl"
+                    >
+                      Nuage de mots
+                    </v-alert>
 
-                  <vue-word-cloud
-                        class="ma-4"
-                        style="
-                            height: 255px;
-                            width: 90%;
-                            "
-                        :animation-duration="2000"
-                        :rotation="4"
-                        :spacing="1"
-                        rotation-unit="deg"
-                        :words="words_cloud"
-                        :color="([, weight]) => weight > 10 ? 'black' : weight > 5 ? 'RoyalBlue' : 'Indigo'"
-                        font-family="Roboto"
+                    <vue-word-cloud
+                          class="ma-4"
+                          style="
+                              height: 255px;
+                              width: 90%;
+                              "
+                          :animation-duration="2000"
+                          :rotation="4"
+                          :spacing="1"
+                          rotation-unit="deg"
+                          :words="words_cloud"
+                          :color="([, weight]) => weight > 10 ? 'black' : weight > 5 ? 'RoyalBlue' : 'Indigo'"
+                          font-family="Roboto"
+                          >
+                          <template slot-scope="{text, weight, word}">
+                            <!-- <v-tooltip
+                                v-model="show"
+                                top
+                              >
+                                <template v-slot:activator="{ on }"> -->
+                                    <div v-on="on" :title="weight" style="cursor: pointer;" @click="onWordClick(word)">
+                                      {{ text }}
+                                    </div>
+                                <!-- </template>
+                                <div><b>{{ text }}</b> est présent {{ weight }} fois dans l'article</div>
+                              </v-tooltip> -->
+                          </template>
+                        </vue-word-cloud>
+
+                        <v-alert
+                          color="info"
+                          dark
+                          dense
+                          icon="mdi-pencil-outline"
+                          border="left"
+                          class="ml-3 mb-n3 mt-6 text-center secondary rounded-tl-0 rounded-bl-0 rounded-br-0 rounded-tr-xl"
                         >
-                        <template slot-scope="{text, weight, word}">
-                          <v-tooltip
-                              v-model="show"
-                              top
-                            >
-                              <template v-slot:activator="{ on }">
-                                  <div v-on="on" :title="weight" style="cursor: pointer;" @click="onWordClick(word)">
-                                    {{ text }}
-                                  </div>
-                              </template>
-                              <div><b>{{ text }}</b> est présent {{ weight }} fois dans l'article</div>
-                            </v-tooltip>
-                        </template>
-                      </vue-word-cloud>
-
-                      <v-alert
-                        color="info"
-                        dark
-                        dense
-                        icon="mdi-pencil-outline"
-                        border="left"
-                        class="ml-3 mb-n3 mt-6 text-center secondary rounded-tl-0 rounded-bl-0 rounded-br-0 rounded-tr-xl"
-                      >
-                        Article
-                      </v-alert>
-                      <v-card-text>
+                          Article
+                        </v-alert>
+                        <v-card-text>
                         
-                        <v-card class="mt-3 ml-3" height="320px">
-                          <v-responsive
-                            max-height="100%"
-                            class="overflow-y-auto pa-3">
-                            <p class="text-caption" v-for="paragraphe in article_paragraphes">
-                              <span class="mr-4"></span> {{ paragraphe }}
-                            </p>
-                          </v-responsive>
-                        </v-card>
+                          <v-card class="mt-3 ml-3" height="320px" :key="key_article">
+                            <v-responsive
+                              max-height="100%"
+                              class="overflow-y-auto pa-3">
+                              <p class="text-caption" v-for="paragraphe in article_paragraphes_click">
+                                <span class="mr-4"></span> <span v-html="paragraphe"></span>
+                              </p>
+                            </v-responsive>
+                          </v-card>
                         
                       </v-card-text>
                     </v-card>
@@ -332,6 +437,17 @@
                   <v-tab-item>
                     <v-card flat>
                       <v-card-text>
+                        <v-alert
+                          class="mt-2 ml-2"
+                          color="blue-grey"
+                          dark
+                          icon="mdi-information-outline"
+                          border="top"
+                          outlined
+                        >
+                          Chaque paragraphe on été analysé indépendament afin d'avoir un aperçu des émotions que transmettait l'article.
+                          Un pourcentage <b>négatif</b> équivaux à un sentiments négatif et inversement pour un pourcentage <b>positif</b>.
+                        </v-alert>
                         <v-data-table
                           :headers="headers"
                           :items="article_analyse_json[0]"
@@ -426,13 +542,39 @@ export default {
         article_text: '',
         dialog_resultat: false,
         article_paragraphes: [],
+        article_paragraphes_click: [],
         article_analyse_json: [],
         words_cloud: [],
-        isVertical: true
+        key_article: 0,
+        isVertical: true,
+        satisfactionEmojis: ['😭', '😢', '☹️', '🙁', '😐', '🙂', '😊', '😁', '😄', '😍'],
+        slider: 45,
       }
     },
     methods: {
       onWordClick: function(word) {
+        var input = word[0]
+        var output = '<mark>' + word[0] + '</mark>'
+
+
+        // Check si le mot a déjà été surligné
+        for(var i = 0; i < this.article_paragraphes_click.length; i++) {
+          if(this.article_paragraphes_click[i].includes(output)) {
+            var temp = input
+            input = output
+            output = temp
+            break
+          }
+        }
+
+        
+
+        for(var i = 0; i < this.article_paragraphes_click.length; i++) {
+          this.article_paragraphes_click[i] = this.article_paragraphes_click[i].replaceAll(input, output)
+        }
+        this.key_article = this.key_article + 1
+        
+
       },
       getParagraphs: function(htmlString) {
         const div = document.createElement("div");
@@ -540,7 +682,6 @@ export default {
         var articles_list = []
         var s= document.getElementById("avancement");
         for(var i=0; i<tab.length; i++){
-          console.log(i,"/",tab.length)
           
           s.innerText = i + "/" + tab.length + " paragraphe(s) analysé(s)";
           var rawResponse = await fetch('https://corsefaker.herokuapp.com/https://fakernews.herokuapp.com/predictapi', {
@@ -562,6 +703,11 @@ export default {
 
       // Analyser paragraphe par paragraphe
       articleAnalyseEach: function (results) {
+        if(this.article_text.length < 100) {
+          alert("Veuillez insérer un article avec au moins 100 caractères")
+          return
+        }
+        this.dialog = true
         this.articleAnalyseAPI(results)
         .then(result => {
           
@@ -573,6 +719,7 @@ export default {
           }
 
           this.article_paragraphes = result[1]["text"].split('\n\n')
+          this.article_paragraphes_click = this.article_paragraphes
 
           this.objectivity = 100 - Math.abs(result[1]["polarity"])
           this.veracity = result[1]["proba_true"]
@@ -592,7 +739,6 @@ export default {
       onResize() {
         if(window.innerWidth < 800) this.isVertical = false
         else this.isVertical = true
-        console.log("size :", window.innerWidth)
       }
 
     },
