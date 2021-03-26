@@ -9,7 +9,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - faker',
+    titleTemplate: '%s - le détecteur de FakeNews',
     title: 'faker',
     htmlAttrs: {
       lang: 'en'
