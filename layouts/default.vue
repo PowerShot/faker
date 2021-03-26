@@ -16,35 +16,36 @@
         </v-avatar>
 
 
-        <v-btn
-          text
-        >
-          <nuxt-link
-            style="text-decoration: none; color: inherit;"
-            to="/">
+        <nuxt-link
+          style="text-decoration: none; color: inherit;"
+          to="/about">
+            <v-btn
+              text
+            >
               Accueil
-          </nuxt-link>
-        </v-btn>
+            </v-btn>
+        </nuxt-link>
 
-        <v-btn
-          text
-        >
-          <nuxt-link
-            style="text-decoration: none; color: inherit;"
-            to="/about">
+        
+        <nuxt-link
+          style="text-decoration: none; color: inherit;"
+          to="/about">
+            <v-btn
+              text
+            >
               à propos
-          </nuxt-link>
-        </v-btn>
+            </v-btn>
+        </nuxt-link>
 
-        <v-btn
-          text
-        >
-          <nuxt-link
-            style="text-decoration: none; color: inherit;"
-            to="/data">
+        <nuxt-link
+          style="text-decoration: none; color: inherit;"
+          to="/data">
+            <v-btn
+              text
+            >
               vos données
-          </nuxt-link>
-        </v-btn>
+            </v-btn>
+        </nuxt-link>
 
         </v-responsive>
 
