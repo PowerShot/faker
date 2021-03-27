@@ -113,11 +113,13 @@
                   ></v-text-field>
 
                   <v-text-field
+                    v-model="objet"
                     label="Objet"
                     required
                   ></v-text-field>
 
                   <v-textarea
+                      v-model="message"
                       clearable
                       clear-icon="mdi-close-circle"
                       name="input-7-1"
@@ -131,7 +133,7 @@
                     :disabled="!valid"
                     color="success"
                     class="mr-4"
-                    @click="validate;dialog.value = false"
+                    @click="validate;if(valid){dialog.value = false;sendFeedback()}"
                   >
                     Envoyer
                   </v-btn>
@@ -148,7 +150,7 @@
               <v-card-actions class="justify-end">
                 <v-btn
                   text
-                  @click="dialog.value = false"
+                  @click="dialog.value = false;$refs.form.reset()"
                 >Close</v-btn>
               </v-card-actions>
             </v-card>
@@ -209,8 +211,8 @@
       ],
       valid: true,
       name: '',
-      nameRules: [
-      ],
+      objet: '',
+      message: '',
       email: '',
       emailRules: [
         v => !!v || "Un e-mail est requis",
@@ -225,6 +227,19 @@
         this.$refs.form.validate()
       },
       reset () {
+        this.$refs.form.reset()
+      },
+      sendFeedback: function () {
+        let text = 'FORMULAIRE DE CONTACT\nnom :' + this.name + '\n' + 'email : ' + this.email + '\n' + 'objet :' + this.objet + '\n' + 'message :\n' + this.message
+        // global analysis
+        var rawResponse = fetch('https://corsefaker.herokuapp.com/https://fakernews.herokuapp.com/send', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({'form': text})
+        })
         this.$refs.form.reset()
       },
     },

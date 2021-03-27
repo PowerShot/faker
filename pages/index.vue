@@ -78,8 +78,25 @@
           
 
           <v-divider></v-divider>
+          <v-alert
+            class="mt-2 ml-2"
+            color="blue-grey"
+            dark
+            icon="mdi-information-outline"
+            border="top"
+            outlined
+          >
+            Seul les articles en <b>anglais</b> sont géré par notre systèmes pour l'instant.
+          </v-alert>
           
           <!-- Corps de l'article -->
+          <div v-show="erreur_langue">
+            <div class="red darken-4 text-center py-2">
+              <span class="white--text">Désolé il nous est impossible pour l'instant d'analyser d'autre langues que l'anglais. (langue détecté : '{{ this.lang_detect }}')</span>
+              
+            </div>
+            <v-progress-linear color="red lighten-2" value="0" height="5"></v-progress-linear>
+          </div>
           <v-container>
             <v-textarea
               clearable
@@ -188,18 +205,19 @@
 
                       <v-text-field
                         label="Votre avis (facultatif)"
+                        v-model="comment"
                       ></v-text-field>
 
                       <v-btn
                         color="success"
                         class="mr-4"
-                        @click="dialog.value = false"
+                        @click="sendFeedback();dialog.value = false;"
                       >
                         Envoyer
                       </v-btn>
                       <v-btn
                         class="mr-4"
-                        @click="dialog.value = false"
+                        @click="$refs.form.reset();dialog.value = false;"
                       >
                         Fermer
                       </v-btn>
@@ -445,7 +463,7 @@
                           border="top"
                           outlined
                         >
-                          Chaque paragraphe on été analysé indépendament afin d'avoir un aperçu des émotions que transmettait l'article.
+                          Chaque paragraphe a été analysé indépendament afin d'avoir un aperçu des émotions que transmettait l'article.
                           Un pourcentage <b>négatif</b> équivaux à un sentiments négatif et inversement pour un pourcentage <b>positif</b>.
                         </v-alert>
                         <v-data-table
@@ -536,10 +554,13 @@ export default {
         loading_API: false,
         loading_extraction: false,
         erreur_extraction: false,
+        erreur_langue: false,
+        lang_detect: '',
         e1: 1,
         lien: '',
         dialog: false,
         article_text: '',
+        comment: '',
         dialog_resultat: false,
         article_paragraphes: [],
         article_paragraphes_click: [],
@@ -548,7 +569,7 @@ export default {
         key_article: 0,
         isVertical: true,
         satisfactionEmojis: ['😭', '😢', '☹️', '🙁', '😐', '🙂', '😊', '😁', '😄', '😍'],
-        slider: 45,
+        slider: 50,
       }
     },
     methods: {
@@ -607,6 +628,7 @@ export default {
       extractionArticle: function () {
         this.loading_extraction = true
         this.erreur_extraction = false
+        this.erreur_langue = false
 
         this.extractionArticleURL(this.lien)
           .then(result => {
@@ -675,6 +697,7 @@ export default {
           body: JSON.stringify({'article': text})
         });
         var global_analysis = await rawResponse.json();
+        if(global_analysis["language"] != 'en') throw global_analysis["language"]
         global_analysis["text"] = text
 
         // articles_list
@@ -703,11 +726,17 @@ export default {
 
       // Analyser paragraphe par paragraphe
       articleAnalyseEach: function (results) {
+        
+        this.erreur_langue = false
+        this.erreur_extraction = false
+
         if(this.article_text.length < 100) {
           alert("Veuillez insérer un article avec au moins 100 caractères")
           return
         }
         this.dialog = true
+        
+
         this.articleAnalyseAPI(results)
         .then(result => {
           
@@ -731,7 +760,14 @@ export default {
           this.e1 = 2
           console.log(result)
           
-        }).catch(err => console.log(err))
+        }).catch(err => {
+          console.log(err)
+          this.erreur_langue = true
+          this.lang_detect = err
+          this.dialog = false
+          this.dialog_resultat = true
+          this.erreur_extraction = false
+        })
         this.$nuxt.refresh()
         return
       },
@@ -739,7 +775,21 @@ export default {
       onResize() {
         if(window.innerWidth < 800) this.isVertical = false
         else this.isVertical = true
-      }
+      },
+
+      sendFeedback: function () {
+        let text = 'AVIS ANALYSE\nNote de satisfaction :' + parseInt(this.slider) + '%\n' + 'Commentaire : ' + this.comment + '\n' + 'url :' + this.lien + '\n' + 'article :\n' + this.article_text
+        // global analysis
+        var rawResponse = fetch('https://corsefaker.herokuapp.com/https://fakernews.herokuapp.com/send', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({'form': text})
+        })
+        this.$refs.form.reset()
+      },
 
     },
     mounted: function() {
