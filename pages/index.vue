@@ -44,6 +44,16 @@
           <v-card-subtitle>
             Pour utiliser notre outil, copier/coller les articles que vous voulez analyser ci-dessous (au format texte) ou l'extraire via le lien :
           </v-card-subtitle>
+          <v-alert
+            class="mt-2 ml-2"
+            color="blue-grey"
+            dark
+            icon="mdi-information-outline"
+            border="top"
+            outlined
+          >
+            Seuls les articles en <b>anglais</b> sont gérés par notre système pour l'instant.
+          </v-alert>
           <div v-show="erreur_extraction">
             <div class="red darken-4 text-center py-2">
               <span class="white--text">Il nous est impossible d'extraire l'article via le lien URL que vous avez entré, veuillez le copier/coller dans le champs 'Corps de l'article'</span>
@@ -78,16 +88,6 @@
           
 
           <v-divider></v-divider>
-          <v-alert
-            class="mt-2 ml-2"
-            color="blue-grey"
-            dark
-            icon="mdi-information-outline"
-            border="top"
-            outlined
-          >
-            Seul les articles en <b>anglais</b> sont géré par notre systèmes pour l'instant.
-          </v-alert>
           
           <!-- Corps de l'article -->
           <div v-show="erreur_langue">
@@ -288,14 +288,6 @@
                       Analyse par bloc
                     </small> 
                   </v-tab>
-                  <v-tab disabled>
-                    <v-icon left>
-                      mdi-newspaper
-                    </v-icon>
-                    <small>
-                      articles en lien
-                    </small> 
-                  </v-tab>
 
                   <v-tab-item>
                     <v-card flat>
@@ -308,7 +300,7 @@
                           border="top"
                           outlined
                         >
-                          Il s'agit d'une <b>synthèse globale</b> de l'analyse faite par l'IA. Si vous souhaitez en savoir plus vous pouvez aller aux différents onglets en dessous de "<b>résultats avancées</b>.
+                          Il s'agit d'une <b>synthèse globale</b> de l'analyse faite par l'IA. Si vous souhaitez en savoir plus vous pouvez aller aux différents onglets en dessous de "<b>résultats avancées</b>".
                           Si vous avez des remarques ou un avis à donner, vous pouvez le faire sur le bouton "<b>donnez votre avis</b>".
                         </v-alert>
                         <v-row>
@@ -322,19 +314,19 @@
                               :value="veracity"
                               :color="getColorResults(veracity)"
                             >
-                              <b>Véracité</b> : {{ this.veracity }}%
+                              <b>Fiabilité</b> : {{ this.veracity }}%
                             </v-progress-circular>
                           </v-col>
                           <v-col>
                             <!-- Info -->
                             <v-alert
                               border="left"
-                              color="green"
-                              icon="mdi-check"
+                              color="blue"
+                              icon="mdi-information-variant"
                               outlined
                               text
                             >
-                              Le véracité correspond aux proportion d'informations jugé véridique par rapport aux informations jugé fausse 
+                              indique à quel point notre algorithme à jugé cet article fiable en fonction de ceux qu'il connait
                             </v-alert>
                           </v-col>
                         </v-row>
@@ -351,20 +343,22 @@
                               :value="objectivity"
                               :color="getColorResults(objectivity)"
                             >
-                              <b>Objectivité</b> : {{this.objectivity}}%
+                              <b>Sentiments</b> : {{this.objectivity}}%
                             </v-progress-circular>
                           </v-col>
 
                           <v-col>
                             <!-- Info -->
                             <v-alert
-                              border="right"
+                              border="left"
                               color="blue"
-                              icon="mdi-compass"
+                              icon="mdi-information-variant"
                               outlined
                               text
                             >
-                              L'objectivité est un indice d'impartialité à propos de l'écriture de l'article
+                              0% / 49% : sentiment négatif <br>
+                              50% : sentiment neutre <br>
+                              51% / 100% : sentiment positif <br>
                             </v-alert>
                           </v-col>
                         </v-row>
@@ -617,10 +611,19 @@ export default {
         else return 'deep-orange lighten-1'
       },
 
+      getColorPolarityResult: function (val) {
+        if (val > 75) return 'green lighten-1'
+        else if (val > 0) return 'green lighten-2'
+        else if (val == 0) return 'blue-grey lighten-5'
+        else if (val > -75) return 'deep-orange lighten-2'
+        else return 'deep-orange lighten-1'
+      },
+
       getColorResults: function (val) {
         if (val > 75) return 'green lighten-1'
-        else if (val > 50) return 'green lighten-4'
-        else if (val > 25) return 'deep-orange lighten-4'
+        else if (val > 50) return 'green lighten-2'
+        else if (val == 50) return 'blue-grey lighten-5'
+        else if (val > 25) return 'deep-orange lighten-2'
         else if (val > 0) return 'deep-orange lighten-1'
         else return 'red'
       },
@@ -750,7 +753,7 @@ export default {
           this.article_paragraphes = result[1]["text"].split('\n\n')
           this.article_paragraphes_click = this.article_paragraphes
 
-          this.objectivity = 100 - Math.abs(result[1]["polarity"])
+          this.objectivity = Math.round((result[1]["polarity"]+100) / 2)
           this.veracity = result[1]["proba_true"]
 
           this.article_analyse_json = result
